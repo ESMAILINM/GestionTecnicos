@@ -1,0 +1,117 @@
+﻿@page "/Tecnicos/Index"
+@inject TecnicosService tecnicosService
+@inject NavigationManager navigation
+@rendermode InteractiveServer
+
+<div class="container card shadow-lg">
+    <div class="card-header text-center">
+        <h3><strong>Consulta de Técnicos</strong></h3>
+    </div>
+
+    @*Filtro*@
+    <div class="row text-right">
+        <div class="col-md-3">
+            <label for="filtro" class="form-label"><strong>Filtrar por:</strong></label>
+            <InputSelect id="filtro" class="form-select" @bind-Value="filtro">
+                <option value="TecnicoId">TecnicoID</option>
+                <option value="Nombres">Nombres</option>
+                <option value="SueldoHora">Sueldo por Hora</option>
+            </InputSelect>
+        </div>
+
+        @*Busqueda*@
+        <div class="col-md-6">
+            <label for="valorFiltro" class="form-label"><strong>Búsqueda:</strong></label>
+            <div class="input-group">
+                <InputText id="valorFiltro" @bind-Value="valorFiltro" class="form-control" placeholder="Buscar" />
+                <button @onclick="Buscar" class="btn btn-success bi bi-search" type="button"> Buscar</button>
+            </div>
+        </div>
+
+        @*Crear button*@
+        <div class="col-md-3 d-flex align-items-end justify-content-md-end mt-3 mt-md-0">
+            <a href="/Tecnicos/Create" class="btn btn-success"> <i class="bi bi-plus-circle"></i> Crear
+            </a>
+        </div>
+    </div>
+
+    @*Tabla*@
+    <div class="card-body">
+        <table class="table table-light table-bordered">
+            <thead class="table-striped text-center">
+                <tr>
+                    <th>TecnicoID</th>
+                    <th>Nombres</th>
+                    <th>Sueldo por Hora</th>
+                    <th>Editar</th>
+                    <th>Eliminar</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var tecnico in tecnicos)
+                {
+                    <tr>
+                        <td class="text-center">@tecnico.TecnicoId</td>
+                        <td class="text-center">@tecnico.Nombres</td>
+                        <td class="text-center">@tecnico.SueldoHora.ToString("N2")</td> @*Mostrar en formato N2*@
+
+
+                        <td class="text-center">
+
+                            <a href="/Tecnicos/Edit/@tecnico.TecnicoId" class="btn btn-outline-warning bi bi-pencil-square"></a>
+                        </td>
+                        <td class="text-center">
+                            <a href="/Tecnicos/Delete/@tecnico.TecnicoId" class="btn btn-outline-danger"> <i Class="bi bi-trash3"></i> </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+        <div class="card-footer">
+
+        </div>
+    </div>
+</div>
+
+@code {
+    public List<Tecnicos> tecnicos = new List<Tecnicos>();
+    public string filtro = "TecnicoId";
+    public string valorFiltro = "";
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        tecnicos = await tecnicosService.Listar(a => true);
+    }
+
+    public async Task Buscar()
+    {
+        if (!string.IsNullOrWhiteSpace(valorFiltro))
+        {
+            switch (filtro)
+            {
+                case "TecnicoId":
+                    if (int.TryParse(valorFiltro, out int id))
+                    {
+                        tecnicos = await tecnicosService.Listar(t => t.TecnicoId == id);
+                    }
+                    break;
+                case "Nombres":
+                    tecnicos = await tecnicosService.Listar(t => t.Nombres.ToLower().Contains(valorFiltro.ToLower()));
+                    break;
+                case "SueldoHora":
+                    if (decimal.TryParse(valorFiltro, out decimal sueldo))
+                    {
+                        tecnicos = await tecnicosService.Listar(t => t.SueldoHora == sueldo);
+                    }
+                    break;
+            }
+        }
+        else
+        {
+            
+            tecnicos = await tecnicosService.Listar(a => true);
+        }
+    }  
+}
+ 

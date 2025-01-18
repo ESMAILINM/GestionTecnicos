@@ -1,0 +1,115 @@
+﻿@page "/Tecnicos/Create"
+@inject TecnicosService tecnicosService
+@inject NavigationManager navigation
+@rendermode InteractiveServer 
+@inject Blazored.Toast.Services.IToastService ToastService
+
+<PageTitle>Create</PageTitle>
+
+
+<div>
+    @if (!string.IsNullOrEmpty(MensajeError))
+    {
+        <div class="alert alert-danger">@MensajeError</div>
+    }
+</div>
+<PageTitle>Create</PageTitle>
+<EditForm Model="tecnico" OnValidSubmit="Guardar">
+    <DataAnnotationsValidator/>
+
+    <div class="container bg-light">
+        <div class="card shadow">
+            <div class="card-header text-center bg-primary">
+                <h5 class="card-title text-white">Registro de Tecnicos</h5>
+            </div>
+        </div>
+
+        <div class="card-body">
+            @*TecnicoId*@
+            <div class="mb-3">
+                <label class="form-label"><strong>TecnicoId</strong></label>
+                <InputNumber class="form-control" @bind-Value="tecnico.TecnicoId" readonly />
+            </div>
+
+            @*Nombres*@
+            <div class="mb-3">
+                <label class="form-label"><strong>Nombres</strong></label>
+                <InputText class="form-control" @bind-Value="tecnico.Nombres"  />
+                <ValidationMessage For="@(() => tecnico.Nombres)" />
+            </div>
+
+            @*Sueldo por Hora*@
+            <div class="mb-3">
+                <label class="form-label"><strong>Sueldo por Hora</strong></label>
+                <InputNumber class="form-control" @bind-Value="tecnico.SueldoHora" format="N2" />
+                <ValidationMessage For="@(() => tecnico.SueldoHora)" />
+            </div>
+        </div>
+
+        @*footer*@
+        <div class="card-footer text-center mt-2">
+            <button type="button" class="btn btn-outline-primary" @onclick="Nuevo"> <i class="bi bi-plus"></i> Nuevo </button>
+            <button type="submit" class="btn btn-outline-success"> <i class="bi bi-check-circle-fill"></i> Guardar </button>
+            <a href="/Tecnicos/Index" class="btn btn-outline-danger" @onclick="Volver"> <i class="bi bi-arrow-bar-left"></i> Retroceder</a>
+        </div>
+    </div>
+</EditForm>
+
+@code {
+
+    public string MensajeError { get; set; } = string.Empty;
+    public Tecnicos tecnico { get; set; } = new Tecnicos();
+
+    public async Task<bool> Validar()
+    {
+        var encontrado = await tecnicosService.BuscarNombre(tecnico.Nombres);
+        if (encontrado == null)
+        {
+
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
+        
+    
+
+    //guardar 
+    public async Task Guardar()
+    {
+
+       
+        if (string.IsNullOrEmpty(tecnico.Nombres))
+        {
+            MensajeError = "El nombre del técnico no puede estar vacío.";
+            return;
+        }
+        
+      
+        if (await Validar())
+        {
+            
+            await tecnicosService.Guardar(tecnico);
+            tecnico = new Tecnicos(); 
+            navigation.NavigateTo("/Tecnicos/Index"); 
+        }
+        else
+        {
+            
+            MensajeError = "Error al guardar el registro, el nombre digitado ya existe.";
+        }
+    }
+
+    public void Volver()
+    {
+        navigation.NavigateTo("/Tecnicos/Index");
+    }
+
+    public void Nuevo(){
+        this.tecnico = new Tecnicos();
+    }
+
+     
+     
+}
