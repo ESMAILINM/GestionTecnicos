@@ -92,7 +92,7 @@
             
             await tecnicosService.Guardar(tecnico);
             tecnico = new Tecnicos(); 
-            navigation.NavigateTo("/Tecnicos/Index"); 
+            navigation.NavigateTo("/"); 
         }
         else
         {
@@ -103,7 +103,7 @@
 
     public void Volver()
     {
-        navigation.NavigateTo("/Tecnicos/Index");
+        navigation.NavigateTo("/");
     }
 
     public void Nuevo(){
