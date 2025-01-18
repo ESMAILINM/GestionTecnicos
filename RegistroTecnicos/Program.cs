@@ -1,10 +1,28 @@
+using Blazored.Toast;
+using Microsoft.EntityFrameworkCore;
 using RegistroTecnicos.Components;
+using RegistroTecnicos.DAL;
+using RegistroTecnicos.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
+
+//Servicio para la notificacion de error
+builder.Services.AddBlazoredToast();
+
+//INYECCION DEL CONTEXTO
+
+//obtenemos el ConStr para usarlocon el contexto
+var ConSrt = builder.Configuration.GetConnectionString("SqlConStr");
+//Agregar contexto al builder con ConStr
+builder.Services.AddDbContextFactory<Contexto>(o => o.UseSqlServer(ConSrt));
+
+//Inyeccion del service
+builder.Services.AddScoped<TecnicosService>();
+
 
 var app = builder.Build();
 
