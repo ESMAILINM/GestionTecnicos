@@ -56,27 +56,44 @@
         {
             tecnicos = await tecnicosService.Buscar(TecnicoId);
         }
+        // else
+        // {
+        //     return;
+        // }
+    }
+    public async Task<bool> Validar()
+    {
+        var encontrado = await tecnicosService.BuscarNombre(tecnicos.Nombres);
+        if (encontrado == null)
+        {
+
+            return true;
+        }
         else
         {
-            return;
+            return false;
         }
     }
 
     public async Task Modificar()
     {
 
+        if (string.IsNullOrEmpty(tecnicos.Nombres))
+        {
+            MensajeError = "El nombre del técnico no puede estar vacío.";
+            return;
+        }
 
 
-        if (await tecnicosService.ExisteNombre(tecnicos.Nombres))
+        if (await Validar())
         {    
             var resultado = await tecnicosService.Guardar(tecnicos);
-            
         	tecnicos = new Tecnicos();
 			Volver(); 
 		}
 		else
 		{
-			MensajeError = "Error al guardar el registro, el nombre digitado ya existe.";
+			MensajeError = "Error al modificar este registro, el nombre digitado ya existe.";
 		}
 	}
 
