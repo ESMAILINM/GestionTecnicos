@@ -28,7 +28,7 @@
             @*TecnicoId*@
             <div class="mb-3">
                 <label class="form-label"><strong>TecnicoId</strong></label>
-                <InputNumber class="form-control" @bind="tecnico.TecnicoId" readonly />
+                <InputNumber TValue="int" class="form-control" @bind="tecnico.TecnicoId" readonly />
             </div>
 
             @*Nombres*@
@@ -41,7 +41,7 @@
             @*Sueldo por Hora*@
             <div class="mb-3">
                 <label class="form-label"><strong>Sueldo por Hora</strong></label>
-                <InputNumber class="form-control" @bind="tecnico.SueldoHora" format="N2" />
+                <InputNumber TValue="decimal" class="form-control" @bind="tecnico.SueldoHora" format="N2" />
                 <ValidationMessage For="@(() => tecnico.SueldoHora)" />
             </div>
         </div>
