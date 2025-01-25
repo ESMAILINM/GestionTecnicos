@@ -21,38 +21,39 @@
         <div class="card shadow">
             <div class="card-header text-center bg-primary">
                 <h5 class="card-title text-white">Registro de Tecnicos</h5>
-            
-        </div>
 
-        <div class="card-body">
-            @*TecnicoId*@
-            <div class="mb-3">
-                <label class="form-label"><strong>TecnicoId</strong></label>
-                <InputNumber id="id" class="form-control" @bind-Value="tecnico.TecnicoId" readonly></InputNumber>
             </div>
 
-            @*Nombres*@
-            <div class="mb-3">
-                <label class="form-label"><strong>Nombres</strong></label>
-                <InputText id="Nombres" class="form-control" @bind-Value="tecnico.Nombres" />
-                <ValidationMessage For="@(() => tecnico.Nombres)" />
+            <div class="card-body">
+                @*TecnicoId*@
+                <div class="mb-3">
+                    <label class="form-label"><strong>TecnicoId</strong></label>
+                    <InputNumber id="id" class="form-control" @bind-Value="tecnico.TecnicoId" readonly></InputNumber>
+                </div>
+
+                @*Nombres*@
+                <div class="mb-3">
+                    <label class="form-label"><strong>Nombres</strong></label>
+                    <InputText id="Nombres" class="form-control" @bind-Value="tecnico.Nombres" />
+                    <ValidationMessage For="@(() => tecnico.Nombres)" />
+                </div>
+
+                @*Sueldo por Hora*@
+                <div class="mb-3">
+                    <label class="form-label"><strong>Sueldo por Hora</strong></label>
+                    <InputNumber id="SueldoHora" class="form-control" @bind-Value="tecnico.SueldoHora" format="N2" min="0"
+                                 step="0.01" />
+                    <ValidationMessage For="@(() => tecnico.SueldoHora)" />
+                </div>
             </div>
 
-            @*Sueldo por Hora*@
-            <div class="mb-3">
-                <label class="form-label"><strong>Sueldo por Hora</strong></label>
-                <InputNumber id="SueldoHora" class="form-control" @bind-Value="tecnico.SueldoHora" format="N2" />
-                <ValidationMessage For="@(() => tecnico.SueldoHora)" />
+            @*footer*@
+            <div class="card-footer text-center mt-2">
+                <button type="button" class="btn btn-outline-primary" @onclick="Nuevo"> <i class="bi bi-plus"></i> Nuevo </button>
+                <button type="submit" class="btn btn-outline-success"> <i class="bi bi-check-circle-fill"></i> Guardar </button>
+                <a href="/Tecnicos/Index" class="btn btn-outline-danger" @onclick="Volver"> <i class="bi bi-arrow-bar-left"></i> Retroceder</a>
             </div>
         </div>
-
-        @*footer*@
-        <div class="card-footer text-center mt-2">
-            <button type="button" class="btn btn-outline-primary" @onclick="Nuevo"> <i class="bi bi-plus"></i> Nuevo </button>
-            <button type="submit" class="btn btn-outline-success"> <i class="bi bi-check-circle-fill"></i> Guardar </button>
-            <a href="/Tecnicos/Index" class="btn btn-outline-danger" @onclick="Volver"> <i class="bi bi-arrow-bar-left"></i> Retroceder</a>
-        </div>
-    </div>
     </div>
 </EditForm>
 
@@ -64,6 +65,7 @@
     public async Task<bool> Validar()
     {
         var encontrado = await tecnicosService.BuscarNombre(tecnico.Nombres);
+
         if (encontrado == null)
         {
 
@@ -73,27 +75,27 @@
             return false;
         }
     }
-        
-    
+
+
 
     //guardar 
     public async Task Guardar()
     {
 
-       
+
         if (string.IsNullOrEmpty(tecnico.Nombres))
         {
             MensajeError = "El nombre del técnico no puede estar vacío.";
             return;
         }
-        
-      
+
+
         if (await Validar())
         {
-            
+
             await tecnicosService.Guardar(tecnico);
-            tecnico = new Tecnicos(); 
-            navigation.NavigateTo("/"); 
+            tecnico = new Tecnicos();
+            Volver();
         }
         else
         {
@@ -104,7 +106,7 @@
 
     public void Volver()
     {
-        navigation.NavigateTo("/");
+        navigation.NavigateTo("Tecnicos/Index");
     }
 
     public void Nuevo(){
