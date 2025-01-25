@@ -55,7 +55,7 @@
         if (tecnicos != null)
         {
             tecnicos = await tecnicosService.Buscar(TecnicoId);
-           
+
         }
         // else
         // {
@@ -65,15 +65,12 @@
     public async Task<bool> Validar()
     {
         var encontrado = await tecnicosService.BuscarNombre(tecnicos.Nombres);
-        if (encontrado == null)
+        if (encontrado != null && encontrado.TecnicoId != tecnicos.TecnicoId)
         {
-
-            return true;
-        }
-        else
-        {
+            MensajeError = "Este nombre ya existe";
             return false;
         }
+        return true;
     }
 
     public async Task Modificar()
@@ -100,6 +97,6 @@
 
 	public void Volver()
 	{
-		navigation.NavigateTo("/");
+		navigation.NavigateTo("Tecnicos/Index");
 	}
 }
