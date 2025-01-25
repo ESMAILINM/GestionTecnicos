@@ -1,0 +1,151 @@
+﻿@page "/Clientes/Edit/{ClienteId:int}"
+@inject ClientesService ClienteService
+@inject NavigationManager navigation
+@inject TecnicosService TecncioService
+@rendermode InteractiveServer
+@inject Blazored.Toast.Services.IToastService ToastService
+
+<PageTitle>Editar Tecnico</PageTitle>
+<div>
+    @if (!string.IsNullOrEmpty(MensajeError))
+    {
+        <div class="alert alert-danger">@MensajeError</div>
+    }
+</div>
+<EditForm Model="cliente" OnValidSubmit="Modificar">
+    <DataAnnotationsValidator />
+    <div class="container">
+        <div class="card shadow-lg">
+            <div class="card-header text-center">
+                <h1><strong>Editar Cliente</strong></h1>
+            </div>
+            <div class="card-body">
+
+                @*Nombre Tecnico Encargado*@
+                <div class="mb-3">
+                    <label for="TecnicoId" class="form-label"><strong> Tecnico Encargado</strong></label>
+                    <div class="input-group">
+                        <InputSelect id="TecnicoId" class="form-control form-select" @bind-Value="cliente.TecnicoId">
+                            <option value="0" selected disabled>Elija una opción</option>
+                            @foreach (var Tecnicos in todosTecnicos)
+                            {
+                                <option value="@Tecnicos.TecnicoId">@Tecnicos.Nombres</option>
+                            }
+                        </InputSelect>
+                    </div>
+                    <ValidationMessage For="@(() => cliente.TecnicoId)" />
+                </div>
+                @*  <label for="Tecnico" class="form-label"><strong> Tecnico Encargado</strong></label>
+                <Inputselect id="TecnicoId" class="form-control" @bind-Value=""></Inputselect> *@
+
+
+                @*Id*@
+                <label for="id" class="form-label"><strong>ClienteId</strong></label>
+                <InputNumber id="id" class="form-control" @bind-Value="cliente.ClienteId" readonly></InputNumber>
+
+                @*Nombre*@
+                <label for="NombreTecnico" class="form-label"><strong>Nombre</strong></label>
+                <InputText id="Nombres" class="form-control" @bind-Value="cliente.Nombres"></InputText>
+                <ValidationMessage For="@(()=> cliente.Nombres)"></ValidationMessage>
+
+                @*FechaIngreso*@
+                <label for="FechaIngreso" class="form-label"><strong>FechaIngreso</strong></label>
+                <InputDate id="FechaIngreso" class="form-control" @bind-Value="cliente.FechaIngreso"></InputDate>
+                <ValidationMessage For="@(()=> cliente.FechaIngreso)"></ValidationMessage>
+
+                @*Direccion*@
+                <div class="mb-3">
+                    <label class="form-label"><strong>Direccion</strong></label>
+                    <InputText id="Direccion" class="form-control" @bind-Value="cliente.Direccion" />
+                    <ValidationMessage For="@(() => cliente.Direccion)" />
+
+                    @*Rnc*@
+                    <label class="form-label"><strong>Rnc</strong></label>
+                    <InputText id="Rnc" class="form-control" @bind-Value="cliente.Rnc" />
+                    <ValidationMessage For="@(() =>cliente.Rnc)" />
+
+                    @*LimiteCredito*@
+                    <label class="form-label"><strong>Limite de Credito</strong></label>
+                    <InputNumber id="LimiteCredito" class="form-control" @bind-Value="cliente.LimiteCredito" />
+                    <ValidationMessage For="@(() => cliente.LimiteCredito)" />
+                </div>
+                @* 
+                Footer *@
+                <div class="card-footer">
+                    <button type="button" class="btn btn-info text-white bi bi-arrow-90deg-left" @onclick="Volver"> Volver</button>
+                    <button type="submit" class="btn btn-success bi bi-pencil-square"> Modificar</button>
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+
+</EditForm>
+@code {
+
+    [Parameter]
+    public int ClienteId { get; set; }
+    public string MensajeError { get; set; } = string.Empty;
+    public Clientes cliente = new Clientes();
+    // public Tecnicos Tecnico = new Tecnicos();
+    public List<Tecnicos> todosTecnicos { get; set; } = new List<Tecnicos>();
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        cliente = await ClienteService.Buscar(ClienteId);
+        todosTecnicos = await TecncioService.Listar(t => true);
+
+    }
+    public async Task<bool> Validar()
+    {
+
+        var encontrado = await ClienteService.BuscarNombre(cliente.Nombres);
+        if (encontrado != null && encontrado.ClienteId != cliente.ClienteId)
+        {
+            MensajeError = "Este nombre ya existe";
+            return false;
+
+        }
+            var existernc = await ClienteService.ExisteRnc(cliente.ClienteId, cliente.Rnc);
+            if (existernc)
+            {
+                MensajeError = "Este RNC ya existe";
+                return false;
+            }
+        
+
+        return true; 
+    }
+
+
+    public async Task Modificar()
+    {
+
+        if (string.IsNullOrEmpty(cliente.Nombres))
+        {
+            MensajeError = "El nombre del cliente no puede estar vacío.";
+            return;
+        }
+     
+
+        if (await Validar())
+        {
+            var resultado = await ClienteService.Guardar(cliente);
+            cliente = new Clientes();
+            Volver();
+        }
+        else
+        {
+            MensajeError = "Error al modificar este registro, el nombre digitado ya existe.";
+        }
+    }
+
+    public void Volver()
+    {
+        navigation.NavigateTo("Clientes/Index");
+    }
+}
+
+
