@@ -7,6 +7,7 @@ namespace RegistroTecnicos.Models
         [Key]
         public int TecnicoId { get; set; }
 
+        [RegularExpression(@"^[a-zA-Z\s]+$", ErrorMessage = "No se permiten Numero")]
         [Required(ErrorMessage = "Este campo es requerido")]
         public string? Nombres { get; set; }
 
