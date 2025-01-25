@@ -1,0 +1,124 @@
+﻿@page "/Clientes/Index"
+@inject ClientesService ClienteService
+@inject TecnicosService tecnicoService
+@inject NavigationManager navigation
+@rendermode InteractiveServer
+
+<div class="container card shadow-lg">
+    <div class="card-header text-center">
+        <h3><strong>Consulta de Clientes</strong></h3>
+    </div>
+
+    @*Filtro*@
+    <div class="row text-right">
+        <div class="col-md-3">
+            <label for="filtro" class="form-label"><strong>Filtrar por:</strong></label>
+            <InputSelect id="filtro" class="form-select" @bind-Value="filtro">
+                <option value="ClienteId">ClienteID</option>
+                <option value="Nombres">Nombres</option>
+                <option value="Tecnico">Tecnico Encargado</option>
+            </InputSelect>
+        </div>
+
+        @*Busqueda*@
+        <div class="col-md-6">
+            <label for="valorFiltro" class="form-label"><strong>Búsqueda:</strong></label>
+            <div class="input-group">
+                <InputText id="valorFiltro" @bind-Value="valorFiltro" class="form-control" placeholder="Buscar" />
+                <button @onclick="Buscar" class="btn btn-success bi bi-search" type="button"> Buscar</button>
+            </div>
+        </div>
+
+        @*Crear button*@
+        <div class="col-md-3 d-flex align-items-end justify-content-md-end mt-3 mt-md-0">
+            <a href="Clientes/Create" class="btn btn-success"> <i class="bi bi-plus-circle"></i> Crear </a>
+        </div>
+
+    @*Tabla*@
+    <div class="card-body">
+        <table class="table table-light table-bordered">
+            <thead class="table-striped text-center">
+                <tr>
+                    <th>ClienteId</th>
+                    <th>Tecnico Encargado</th>
+                    <th>Nombres</th>
+                    <th>Fecha Ingreso</th>
+                    <th>Direcci&oacute;</th>
+                    <th>Rnc</th>
+                    <th>L&iacute;mite Cr&eacute;dito</th>
+                    <th>Editar</th>
+                    <th>Eliminar</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var client in clientesli)
+                {
+                    var Tecnico = tecnicos.FirstOrDefault(t => t.TecnicoId == client.TecnicoId);
+                    <tr>
+                        <td class="text-center">@client.ClienteId</td>
+                            <td class="text-center">@Tecnico?.Nombres</td>  
+                        <td class="text-center">@client.Nombres</td>
+                        <td class="text-center">@client.FechaIngreso</td>
+                        <td class="text-center">@client.Direccion</td>
+                        <td class="text-center">@client.Rnc</td>
+                        <td class="text-center">@client.LimiteCredito</td>
+
+
+
+
+                        <td class="text-center">
+                            <a href="/Clientes/Edit/@client.ClienteId" class="btn btn-outline-warning"> <i class=" bi bi-pencil-square"></i></a>
+                        </td>
+                        <td class="text-center">
+                            <a href="/Clientes/Delete/@client.ClienteId" class="btn btn-outline-danger"> <i class="bi bi-trash3"></i> </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+       </div>
+    </div>
+</div>
+
+@code {
+    public List<Tecnicos> tecnicos { get; set; } = new List<Tecnicos>();
+    public List<Clientes> clientesli = new List<Clientes>();
+    public string filtro = "ClienteId";
+    public string valorFiltro = "";
+    public Clientes clientes = new Clientes();
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        clientesli= await ClienteService.Listar(a => true);
+        tecnicos = await tecnicoService.Listar(t => true);
+    }
+
+    public async Task Buscar()
+    {
+        if (!string.IsNullOrWhiteSpace(valorFiltro))
+        {
+            switch (filtro)
+            {
+                case "ClienteId":
+                    if (int.TryParse(valorFiltro, out int id))
+                    {
+                        clientesli = await ClienteService.Listar(t => t.ClienteId== id);
+                    }
+                    break;
+                case "Nombres":
+                    clientesli = await ClienteService.Listar(t => t.Nombres.ToLower().Contains(valorFiltro.ToLower()));
+                    break;
+                case "Tecnico": 
+                    clientesli = await ClienteService.Listar(t =>
+                     tecnicos.Any(tecnico => tecnico.TecnicoId == t.TecnicoId && tecnico.Nombres.ToLower().Contains(valorFiltro.ToLower())));
+                    break;
+            }
+        }
+        else
+        {
+
+            clientesli = await ClienteService.Listar(a => true);
+        }
+    }
+}

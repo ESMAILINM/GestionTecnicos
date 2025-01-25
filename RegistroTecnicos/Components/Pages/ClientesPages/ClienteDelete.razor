@@ -1,0 +1,108 @@
+﻿@page "/Clientes/Delete/{ClienteId:int}"
+@inject ClientesService ClienteService
+@inject TecnicosService TecnicoService
+@inject NavigationManager navigation
+@rendermode InteractiveServer
+
+<PageTitle>Eliminar Clientes</PageTitle>
+<EditForm Model="cliente" OnValidSubmit="Eliminar">
+	<DataAnnotationsValidator/>
+
+	<div class="container bg-light">
+		<div class="card shadow">
+			<div class=" card-header bg-primary">
+				<h3 class=" card-title  text-center text-white">Eliminar Cliente</h3>
+			</div>
+         </div>
+			@* Body *@
+			<div class=" card-body">
+				<h4 class="text-danger bg-light">&iquest; Est&aacute;s seguro que desea eliminar este Cliente?</h4>
+
+			<div class="mb-1"></div>
+            <div class="container bg-light mt-4 me-auto ">
+
+                <div class="card shadow">
+
+				<h3 class="card-header card-title text-black"><strong>Datos del Cliente</strong></h3>
+
+				@* Datos *@
+				<div class="card-body">
+
+
+					<p class="mb-0"><strong>Tecnico Encargado:</strong>@cliente.TecnicoId</P>
+
+
+					<div class="mb-0">
+						<p class="mb-1"><strong>Cliente Id:</strong> @cliente.ClienteId</p>
+					</div>
+
+					<div class="mb-0">
+						<p class="mb-1"><strong>Nombres:</strong>@cliente.Nombres</p>
+					</div>
+
+					<div class="mb-0">
+						<p class="mb-1"><strong>Rnc:</strong>@cliente.Rnc</p>
+					</div>
+
+					<div class="mb-0">
+						<p class="mb-1"><strong>Direcci&eacute:</strong>@cliente.Direccion</p>
+					</div>
+
+					<div class="mb-0">
+						<p class="mb-1"><strong>LimiteCredito:</strong>@cliente.LimiteCredito</p>
+					</div>
+
+					<div class="mb-0">
+						<p class="mb-1"><strong>FechaIngreso:</strong>@cliente.FechaIngreso</p>
+					</div>
+				</div>
+				</div>
+
+				</div>
+				@* footer *@
+				<div class="card-footer">
+					<button type="button" class="btn btn-outline-danger bi bi-trash" @onclick ="Eliminar">Eliminar</button>
+					<button type="button" class="btn btn-outline-primary bi bi-box-arrow-left" @onclick="Volver">Volver</button>
+				</div>
+
+		</div>
+	</div>
+</EditForm>
+
+@code {
+	 [Parameter]
+    public int ClienteId { get; set; }
+	public Clientes cliente = new Clientes();
+	public Tecnicos tecnicos= new Tecnicos();
+	
+
+	
+
+	protected override async Task OnInitializedAsync()
+	{
+		if (ClienteId>0)
+		{
+
+
+			cliente = await ClienteService.Buscar(ClienteId);
+		}
+		else
+		{
+			return;
+		}
+	}
+	public async Task Eliminar(){
+
+		var eliminarCliente = await ClienteService.Eliminar(ClienteId);
+		if (eliminarCliente){
+			Volver();
+		}
+		
+
+	  }
+
+	public void Volver(){
+		navigation.NavigateTo("Clientes/Index");
+	}
+
+}
