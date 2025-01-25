@@ -8,18 +8,19 @@ namespace RegistroTecnicos.Services
     public class TecnicosService(IDbContextFactory<Contexto> DbFactory)
     {
         //Metodo para evitar que existan dos tecnicos con el mismo nombre
+        public async Task<bool> BuscarNombre(int Id, string nombre)
+        {
+            await using var contexto = await DbFactory.CreateDbContextAsync();
+            return await contexto.Tecnicos
+                .AnyAsync(T=> (T.TecnicoId != Id && T.Nombres == nombre));
+        }
         public async Task<bool> Existe(int id)
         {
             await using var contexto = await DbFactory.CreateDbContextAsync();
             return await contexto.Tecnicos
                 .AnyAsync(T => T.TecnicoId == id); //Verifica si ya existe un tecnico con ese nombre
         }
-        public async Task<bool> ExisteNombre(string nombre)
-        {
-            await using var contexto = await DbFactory.CreateDbContextAsync();
-            return await contexto.Tecnicos
-                .AnyAsync(T => T.Nombres == nombre); //Verifica si ya existe un tecnico con ese nombre
-        }
+       
 
         //Guardar tecnico 
         public async Task<bool> Guardar(Tecnicos tecnico)
@@ -83,5 +84,5 @@ namespace RegistroTecnicos.Services
             contexto.Update(tecnico);
             return await contexto.SaveChangesAsync() > 0;
         }
-  }  }
+    }  }
 
