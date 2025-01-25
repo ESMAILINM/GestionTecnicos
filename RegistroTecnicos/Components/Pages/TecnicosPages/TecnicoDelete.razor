@@ -16,12 +16,16 @@
 
         <div class="card-body">
             <h4 class="text-danger bg-light"> ¿Estás seguro que quieres eliminar este Tecnico?</h4>
+
             <div class="mb-1"></div>
             <div class="container bg-light mt-4 me-auto ">
+
                 <div class="card shadow">
+                   
                     <h3 class="card-header card-title text-black"><strong>Datos del Tecnico</strong></h3>
                     <div class="card-body">
                         <p class="mb-0"><strong>Tecnico ID:</strong> @tecnico.TecnicoId</p>
+
                         <div class="mb-1">
                             <p class="mb-0"><strong>Nombres:</strong> @tecnico.Nombres</p>
                         </div>
@@ -71,6 +75,6 @@
 
 	public void Volver()
 	{
-		navigation.NavigateTo("/");
+        navigation.NavigateTo("Tecnicos/Index");
 	}
 }
