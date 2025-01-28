@@ -1,0 +1,73 @@
+﻿@page "/Ciudades/Delete/{CiudadId:int}"
+@inject CiudadesService ciudadesService
+@inject NavigationManager navigation
+@rendermode InteractiveServer
+
+<PageTitle>Eliminar Ciudad</PageTitle>
+<EditForm Model="ciudad" OnValidSubmit="Eliminar">
+    <DataAnnotationsValidator />
+
+    <div class="container bg-light">
+        <div class="card shadow">
+            <div class="card-header bg-primary">
+                <h3 class="card-title text-center text-white">Eliminar Ciudad</h3>
+            </div>
+        </div>
+
+        <div class="card-body">
+            <h4 class="text-danger bg-light"> ¿Est&aacute;s seguro que quieres eliminar esta Ciudad?</h4>
+
+            <div class="mb-1"></div>
+            <div class="container bg-light mt-4 me-auto">
+
+                <div class="card shadow">
+                   
+                    <h3 class="card-header card-title text-black"><strong>Datos de la Ciudad</strong></h3>
+                    <div class="card-body">
+                        <p class="mb-0"><strong>Ciudad ID:</strong> @ciudad.CiudadId</p>
+
+                        <div class="mb-1">
+                            <p class="mb-0"><strong>Nombre:</strong> @ciudad.Nombre</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <button type="button" class="btn btn-outline-danger bi bi-trash" @onclick="Eliminar">Eliminar</button>
+                    <button type="button" class="btn btn-outline-primary bi bi-box-arrow-left" @onclick="Volver">Volver</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</EditForm>
+
+@code {
+    [Parameter]
+    public int CiudadId { get; set; }
+
+    public Ciudades ciudad { get; set; } = new Ciudades();
+
+    protected override async Task OnInitializedAsync()
+    {
+        ciudad = await ciudadesService.BuscarId(CiudadId);
+
+        if (ciudad == null)
+        {
+            navigation.NavigateTo("Ciudades/Index"); 
+        }
+    }
+
+    public async Task Eliminar()
+    {
+        var eliminar = await ciudadesService.Eliminar(ciudad.CiudadId);
+
+        if (eliminar)
+        {
+            Volver();
+        }
+    }
+
+    public void Volver()
+    {
+        navigation.NavigateTo("Ciudades/Index");
+    }
+}
