@@ -1,0 +1,98 @@
+﻿@page "/Ciudades/Create"
+@inject CiudadesService ciudadesService
+@inject NavigationManager navigation
+@rendermode InteractiveServer
+@inject Blazored.Toast.Services.IToastService ToastService
+
+<PageTitle>Crear Ciudad</PageTitle>
+
+<div>
+    @if (!string.IsNullOrEmpty(MensajeError))
+    {
+        <div class="alert alert-danger">@MensajeError</div>
+    }
+</div>
+
+<EditForm Model="ciudad" OnValidSubmit="Guardar">
+    <DataAnnotationsValidator />
+
+    <div class="container bg-light">
+        <div class="card shadow">
+            <div class="card-header text-center bg-primary">
+                <h5 class="card-title text-white">Registro de Ciudades</h5>
+            </div>
+
+            <div class="card-body">
+                @*CiudadId*@
+                <div class="mb-3">
+                    <label class="form-label"><strong>Ciudad ID</strong></label>
+                    <InputNumber id="id" class="form-control" @bind-Value="ciudad.CiudadId" readonly></InputNumber>
+                </div>
+
+                @*Nombre*@
+                <div class="mb-3">
+                    <label class="form-label"><strong>Nombre</strong></label>
+                    <InputText id="Nombre" class="form-control" @bind-Value="ciudad.Nombre" />
+                    <ValidationMessage For="@(() => ciudad.Nombre)" />
+                </div>
+            </div>
+
+            @*footer*@
+            <div class="card-footer text-center mt-2">
+                <button type="button" class="btn btn-outline-primary" @onclick="Nuevo"> <i class="bi bi-plus"></i> Nuevo </button>
+                <button type="submit" class="btn btn-outline-success"> <i class="bi bi-check-circle-fill"></i> Guardar </button>
+                <a href="/Ciudades/Index" class="btn btn-outline-danger" @onclick="Volver"> <i class="bi bi-arrow-bar-left"></i> Retroceder</a>
+            </div>
+        </div>
+    </div>
+</EditForm>
+
+@code {
+
+    public string MensajeError { get; set; } = string.Empty;
+    public Ciudades ciudad { get; set; } = new Ciudades();
+
+    public async Task<bool> Validar()
+    {
+        var encontrado = await ciudadesService.BuscarNombre(ciudad.Nombre);
+
+        if (encontrado == null)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    public async Task Guardar()
+    {
+        if (string.IsNullOrEmpty(ciudad.Nombre))
+        {
+            MensajeError = "El nombre de la ciudad no puede estar vacío.";
+            return;
+        }
+
+        if (await Validar())
+        {
+            await ciudadesService.Guardar(ciudad);
+            ciudad = new Ciudades();
+            Volver();
+        }
+        else
+        {
+            MensajeError = "Error al guardar el registro, el nombre digitado ya existe.";
+        }
+    }
+
+    public void Volver()
+    {
+        navigation.NavigateTo("Ciudades/Index");
+    }
+
+    public void Nuevo()
+    {
+        this.ciudad = new Ciudades();
+    }
+}

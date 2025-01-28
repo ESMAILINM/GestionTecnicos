@@ -1,0 +1,87 @@
+﻿@page "/Ciudades/Edit/{CiudadId:int}"
+@inject CiudadesService ciudadesService
+@inject NavigationManager navigation
+@rendermode InteractiveServer
+@inject Blazored.Toast.Services.IToastService ToastService
+
+<PageTitle>Editar Ciudad</PageTitle>
+<div>
+    @if (!string.IsNullOrEmpty(MensajeError))
+    {
+        <div class="alert alert-danger">@MensajeError</div>
+    }
+</div>
+<EditForm Model="ciudad" OnValidSubmit="Modificar">
+    <DataAnnotationsValidator />
+    <div class="container">
+        <div class="card shadow-lg">
+            <div class="card-header text-center">
+                <h1><strong>Editar Ciudad</strong></h1>
+            </div>
+            <div class="card-body">
+
+                @*Id*@ 
+                <label for="id" class="form-label"><strong>ID</strong></label>
+                <InputNumber id="id" class="form-control" @bind-Value="ciudad.CiudadId" readonly></InputNumber>
+
+                @*Nombre Ciudad*@ 
+                <label for="NombreCiudad" class="form-label"><strong>Nombre</strong></label>
+                <InputText id="NombreCiudad" class="form-control" @bind-Value="ciudad.Nombre"></InputText>
+                <ValidationMessage For="@(() => ciudad.Nombre)"></ValidationMessage>
+
+            </div>
+            <div class="card-footer">
+                <button type="button" class="btn btn-info text-white bi bi-arrow-90deg-left" @onclick="Volver"> Volver</button>
+                <button type="submit" class="btn btn-success bi bi-pencil-square"> Modificar</button>
+            </div>
+        </div>
+    </div>
+</EditForm>
+
+@code {
+    [Parameter]
+    public int CiudadId { get; set; }
+    public string MensajeError { get; set; } = string.Empty;
+    public Ciudades ciudad { get; set; } = new Ciudades();
+
+    protected override async Task OnInitializedAsync()
+    {
+        ciudad = await ciudadesService.BuscarId(CiudadId);
+    }
+
+    public async Task<bool> Validar()
+    {
+        var encontrado = await ciudadesService.BuscarNombre(ciudad.Nombre);
+        if (encontrado != null && encontrado.CiudadId != ciudad.CiudadId)
+        {
+            MensajeError = "Este nombre ya existe";
+            return false;
+        }
+        return true;
+    }
+
+    public async Task Modificar()
+    {
+        if (string.IsNullOrEmpty(ciudad.Nombre))
+        {
+            MensajeError = "El nombre de la ciudad no puede estar vacío.";
+            return;
+        }
+
+        if (await Validar())
+        {
+            var resultado = await ciudadesService.Guardar(ciudad);
+            ciudad = new Ciudades();
+            Volver();
+        }
+        else
+        {
+            MensajeError = "Error al modificar este registro, el nombre digitado ya existe.";
+        }
+    }
+
+    public void Volver()
+    {
+        navigation.NavigateTo("Ciudades/Index");
+    }
+}
