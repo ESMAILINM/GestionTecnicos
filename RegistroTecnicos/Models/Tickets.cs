@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.EntityFrameworkCore;
 
 namespace RegistroTecnicos.Models
 {
@@ -7,10 +8,10 @@ namespace RegistroTecnicos.Models
     {
         [Key]
         public int TicketId { get; set; }
-        public DateOnly Fecha { get; set; }
+        public DateTime Fecha { get; set; } = DateTime.Now;
         public string Prioridad { get; set; }
-        public int ClienteId { get; set; }
-        public int TecnicoId { get; set; }
+        public int? ClienteId { get; set; }
+        public int? TecnicoId { get; set; }
         public string Asunto { get; set; }
         public string Descripcion { get; set; }
         public string TiempoInvertido {get; set;}
@@ -21,6 +22,6 @@ namespace RegistroTecnicos.Models
 
         [ForeignKey("TecnicoId")]
         public  Tecnicos tecnicos { get; set; }
-
+   
     }
 }
