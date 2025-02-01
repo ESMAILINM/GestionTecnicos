@@ -1,11 +1,13 @@
 ﻿@page "/Tickets/Index"
 @inject TicketsService ticketsService
 @inject NavigationManager navigation
+@inject ClientesService clientesService
+@inject TecnicosService tecnicoService
 @rendermode InteractiveServer
 
 <div class="container card shadow-lg">
     <div class="card-header text-center">
-        <h3><strong>Consulta de Técnicos</strong></h3>
+        <h3><strong>Consulta de Tickets</strong></h3>
     </div>
 
     @*Filtro*@
@@ -16,11 +18,7 @@
                 <option value="TicketId">TicketID</option>
                 <option value="Fecha">Fecha</option>
                 <option value="Prioridad">Prioridad</option>
-                <option value="Asunto">Asunto</option>
-                <opcion value="Descripcion">Descripcion</opcion>
-                <opcion value="TiempoInvertido">Tiempo Invertido</opcion>
-                <opcion value ="ClienteId">ClienteId</opcion>
-                <opcion value="TecnicoId">TecnicoId</opcion>
+               
 
             </InputSelect>
         </div>
@@ -55,11 +53,15 @@
                     <th>Tiempo Invertido</th>
                     <th>ClienteId</th>
                     <th>TecnicoId</th>
+                    <th>Editar</th>
+                    <th>Eliminar</th>
                 </tr>
             </thead>
             <tbody>
                 @foreach (var ticket in tickets)
                 {
+                    var Tecnico = tecnicos.FirstOrDefault(t => t.TecnicoId == ticket.TecnicoId);
+                    var Cliente = clientes.FirstOrDefault(c=> c.ClienteId == ticket.ClienteId);
                     <tr>
                         <td class="text-center">@ticket.TicketId</td>
                         <td class="text-center">@ticket.Fecha</td>
@@ -67,8 +69,8 @@
                         <td class="text-center">@ticket.Asunto</td>
                         <td class="text-center">@ticket.Descripcion</td>
                         <td class="text-center">@ticket.TiempoInvertido</td>
-                        <td class="text-center">@ticket.ClienteId</td>
-                        <td class="text-center">@ticket.TecnicoId</td>
+                        <td class="text-center">@Cliente?.Nombres</td>
+                        <td class="text-center">@Tecnico?.Nombres</td>
 
 
                         <td class="text-center">
@@ -89,6 +91,9 @@
 
 @code {
     public List<Tickets> tickets = new List<Tickets>();
+    public List<Tecnicos> tecnicos = new List<Tecnicos>();
+    public List<Clientes> clientes = new List<Clientes>();
+    private List<string> Prioridades = new List<string> { "Alta", "Media", "Baja" };
     public string filtro = "TicketId";
     public string valorFiltro = "";
 
@@ -96,6 +101,9 @@
     protected override async Task OnInitializedAsync()
     {
         tickets = await ticketsService.Listar(a => true);
+        tecnicos = await tecnicoService.Listar(t => true);
+        clientes = await clientesService.Listar(c => true);
+
     }
 
     public async Task Buscar()
@@ -110,10 +118,17 @@
                         tickets = await ticketsService.Listar(t => t.TecnicoId == id);
                     }
                     break;
+                case "Fecha":
+                    if (DateTime.TryParse(valorFiltro, out DateTime fecha))
+                    {
+                        tickets = await ticketsService.Listar(t => t.Fecha.Date == fecha.Date);
+                    }
+                    break;
+                          
                 case "Prioridad":
 
 
-                    tickets = await ticketsService.Listar(t => t.Prioridad == valorFiltro);
+                    tickets = await ticketsService.Listar(t => t.Prioridad.ToLower() == valorFiltro.ToLower());
                     break;    
 
             }

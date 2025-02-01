@@ -1,4 +1,4 @@
-﻿@page "/Tickets/Delete/{TecnicoId:int}"
+﻿@page "/Tickets/Delete/{TicketId:int}"
 @inject TicketsService ticketsService
 @inject NavigationManager navigation
 @rendermode InteractiveServer
@@ -24,16 +24,32 @@
 
                     <h3 class="card-header card-title text-black"><strong>Datos del Ticket</strong></h3>
                     <div class="card-body">
-                        <p class="mb-0"><strong>Ticket ID:</strong> @ticket.TicketId</p>
+                        <p class="mb-0"><strong> TicketId:</strong> @ticket.TicketId</p>
 
                         <div class="mb-1">
-                            <p class="mb-0"><strong>Fecha:</strong> @ticket.Fecha</p>
+                            <p class="mb-0"><strong>TecnicoId:</strong> @ticket.TecnicoId</p>
+                        </div>
+                        <div class="mb-1">
+                            <p class="mb-0"><strong>ClienteId</strong> @ticket.ClienteId</p>
+                        </div>
+
+                        <div class="mb-1">
+                            <p class="mb-0"><strong>Prioridad</strong> @ticket.Prioridad</p>
+                        </div>
+                        <div class="mb-1">
+                            <p class="mb-0"><strong>Asunto</strong> @ticket.Asunto</p>
                         </div>
                         <div class="mb-1">
                             <p class="mb-0"><strong>Descripcion</strong> @ticket.Descripcion</p>
                         </div>
+                        <div class="mb-1">
+                            <p class="mb-0"><strong>Fecha</strong> @ticket.Fecha</p>
+                        </div>
+                            <div class="mb-1">
+                                <p class="mb-0"><strong>Tiempo Inverido</strong> @ticket.TiempoInvertido</p>
+                        </div>
                     </div>
-                </div>
+                    </div>
                 <div class="card-footer">
                     <button type="button" class="btn btn-outline-danger bi bi-trash" @onclick="Eliminar">Eliminar</button>
                     <button type="button" class="btn btn-outline-primary bi bi-box-arrow-left" @onclick="Volver">Volver</button>
@@ -46,8 +62,10 @@
 @code {
     [Parameter]
     public int TicketId { get; set; }
+    
 
     public Tickets ticket { get; set; } = new Tickets();
+
 
     protected override async Task OnInitializedAsync()
     {
