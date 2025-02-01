@@ -22,7 +22,9 @@ builder.Services.AddDbContextFactory<Contexto>(o => o.UseSqlServer(ConSrt));
 
 //Inyeccion del service
 builder.Services.AddScoped<TecnicosService>();
-builder.Services.AddScoped<ClientesService>();   
+builder.Services.AddScoped<ClientesService>();
+builder.Services.AddScoped<TicketsService>();
+
 
 
 var app = builder.Build();
