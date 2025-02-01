@@ -32,7 +32,7 @@ namespace RegistroTecnicos.Migrations
                         column: x => x.TecnicoId,
                         principalTable: "Tecnicos",
                         principalColumn: "TecnicoId",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.NoAction);
                 });
 
             migrationBuilder.CreateIndex(

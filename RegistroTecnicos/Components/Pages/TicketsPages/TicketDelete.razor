@@ -1,0 +1,98 @@
+﻿@page "/Tickets/Delete/{TicketId:int}"
+@inject TicketsService ticketsService
+@inject NavigationManager navigation
+@rendermode InteractiveServer
+
+<PageTitle>Eliminar Ticket</PageTitle>
+<EditForm Model="ticket" OnValidSubmit="Eliminar">
+    <DataAnnotationsValidator />
+
+    <div class="container bg-light">
+        <div class="card shadow">
+            <div class="card-header bg-primary">
+                <h3 class="card-title text-center text-white">Eliminar Ticket</h3>
+            </div>
+        </div>
+
+        <div class="card-body">
+            <h4 class="text-danger bg-light"> ¿Estás seguro que quieres eliminar este Ticket?</h4>
+
+            <div class="mb-1"></div>
+            <div class="container bg-light mt-4 me-auto ">
+
+                <div class="card shadow">
+
+                    <h3 class="card-header card-title text-black"><strong>Datos del Ticket</strong></h3>
+                    <div class="card-body">
+                        <p class="mb-0"><strong> TicketId:</strong> @ticket.TicketId</p>
+
+                        <div class="mb-1">
+                            <p class="mb-0"><strong>TecnicoId:</strong> @ticket.TecnicoId</p>
+                        </div>
+                        <div class="mb-1">
+                            <p class="mb-0"><strong>ClienteId</strong> @ticket.ClienteId</p>
+                        </div>
+
+                        <div class="mb-1">
+                            <p class="mb-0"><strong>Prioridad</strong> @ticket.Prioridad</p>
+                        </div>
+                        <div class="mb-1">
+                            <p class="mb-0"><strong>Asunto</strong> @ticket.Asunto</p>
+                        </div>
+                        <div class="mb-1">
+                            <p class="mb-0"><strong>Descripcion</strong> @ticket.Descripcion</p>
+                        </div>
+                        <div class="mb-1">
+                            <p class="mb-0"><strong>Fecha</strong> @ticket.Fecha</p>
+                        </div>
+                            <div class="mb-1">
+                                <p class="mb-0"><strong>Tiempo Inverido</strong> @ticket.TiempoInvertido</p>
+                        </div>
+                    </div>
+                    </div>
+                <div class="card-footer">
+                    <button type="button" class="btn btn-outline-danger bi bi-trash" @onclick="Eliminar">Eliminar</button>
+                    <button type="button" class="btn btn-outline-primary bi bi-box-arrow-left" @onclick="Volver">Volver</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</EditForm>
+
+@code {
+    [Parameter]
+    public int TicketId { get; set; }
+    
+
+    public Tickets ticket { get; set; } = new Tickets();
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (ticket != null)
+        {
+
+            ticket = await ticketsService.Buscar(TicketId);
+        }
+        else
+        {
+            return;
+        }
+
+    }
+
+    public async Task Eliminar()
+    {
+        var eliminar = await ticketsService.Eliminar(TicketId);
+
+        if (eliminar)
+        {
+            Volver();
+        }
+    }
+
+    public void Volver()
+    {
+        navigation.NavigateTo("Tickets/Index");
+    }
+}
