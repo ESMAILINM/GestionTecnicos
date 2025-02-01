@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using RegistroTecnicos.DAL;
 
@@ -11,9 +12,11 @@ using RegistroTecnicos.DAL;
 namespace RegistroTecnicos.Migrations
 {
     [DbContext(typeof(Contexto))]
-    partial class ContextoModelSnapshot : ModelSnapshot
+    [Migration("20250128014752_TableCiudades")]
+    partial class TableCiudades
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -95,48 +98,6 @@ namespace RegistroTecnicos.Migrations
                     b.ToTable("Tecnicos");
                 });
 
-            modelBuilder.Entity("RegistroTecnicos.Models.Tickets", b =>
-                {
-                    b.Property<int>("TicketId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("TicketId"));
-
-                    b.Property<string>("Asunto")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("ClienteId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Descripcion")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateOnly>("Fecha")
-                        .HasColumnType("date");
-
-                    b.Property<string>("Prioridad")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("TecnicoId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("TiempoInvertido")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("TicketId");
-
-                    b.HasIndex("ClienteId");
-
-                    b.HasIndex("TecnicoId");
-
-                    b.ToTable("Tickets");
-                });
-
             modelBuilder.Entity("RegistroTecnicos.Models.Clientes", b =>
                 {
                     b.HasOne("RegistroTecnicos.Models.Tecnicos", "Tecnico")
@@ -146,23 +107,6 @@ namespace RegistroTecnicos.Migrations
                         .IsRequired();
 
                     b.Navigation("Tecnico");
-                });
-
-            modelBuilder.Entity("RegistroTecnicos.Models.Tickets", b =>
-                {
-                    b.HasOne("RegistroTecnicos.Models.Clientes", "clientes")
-                        .WithMany()
-                        .HasForeignKey("ClienteId")
-                        .OnDelete(DeleteBehavior.NoAction);
-
-                    b.HasOne("RegistroTecnicos.Models.Tecnicos", "tecnicos")
-                        .WithMany()
-                        .HasForeignKey("TecnicoId")
-                        .OnDelete(DeleteBehavior.NoAction);
-
-                    b.Navigation("clientes");
-
-                    b.Navigation("tecnicos");
                 });
 #pragma warning restore 612, 618
         }
