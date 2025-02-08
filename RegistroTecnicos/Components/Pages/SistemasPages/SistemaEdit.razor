@@ -1,0 +1,75 @@
+﻿@page "/Sistemas/Edit/{SistemaId:int}"
+@inject SistemasService sistemasService
+@inject NavigationManager navigation
+@rendermode InteractiveServer
+@inject Blazored.Toast.Services.IToastService ToastService
+
+<PageTitle>Editar Sistema</PageTitle>
+<div>
+    @if (!string.IsNullOrEmpty(MensajeError))
+    {
+        <div class="alert alert-danger">@MensajeError</div>
+    }
+</div>
+<EditForm Model="sistema" OnValidSubmit="Modificar">
+    <DataAnnotationsValidator />
+    <div class="container">
+        <div class="card shadow-lg">
+            <div class="card-header text-center">
+                <h1><strong>Editar Sistema</strong></h1>
+            </div>
+            <div class="card-body">
+
+                @*Id*@ 
+                <label for="id" class="form-label"><strong>ID</strong></label>
+                <InputNumber id="id" class="form-control" @bind-Value="sistema.SistemaId" readonly></InputNumber>
+
+                @*Descripcion*@ 
+                <label for="Descripcion" class="form-label"><strong>Descripcion</strong></label>
+                <InputText id="Descripcion" class="form-control" @bind-Value="sistema.Descripcion"></InputText>
+                <ValidationMessage For="@(() => sistema.Descripcion)"></ValidationMessage>
+
+                @*Complejidad*@ 
+                <label for="Complejidad" class="form-label"><strong>Complejidad</strong></label>
+                <InputNumber id="Complejidad" class="form-control" @bind-Value="sistema.Complejidad"></InputNumber>
+                <ValidationMessage For="@(() => sistema.Complejidad)"></ValidationMessage>
+
+            </div>
+            <div class="card-footer">
+                <button type="button" class="btn btn-info text-white bi bi-arrow-90deg-left" @onclick="Volver"> Volver</button>
+                <button type="submit" class="btn btn-success bi bi-pencil-square"> Modificar</button>
+            </div>
+        </div>
+    </div>
+</EditForm>
+
+@code {
+    [Parameter]
+    public int SistemaId { get; set; }
+    public string MensajeError { get; set; } = string.Empty;
+    public Sistemas sistema { get; set; } = new Sistemas();
+
+    protected override async Task OnInitializedAsync()
+    {
+        sistema = await sistemasService.Buscar(SistemaId);
+    }
+    
+    public async Task Modificar()
+    {
+        if (sistema.Complejidad <= 0 )
+        {
+            MensajeError = "El campo debe ser llenado entre valores 0 y 10.";
+            return;
+        }
+        
+            var resultado = await sistemasService.Guardar(sistema);
+            sistema = new Sistemas();
+            Volver();
+        
+    }
+
+    public void Volver()
+    {
+        navigation.NavigateTo("Sistemas/Index");
+    }
+}
