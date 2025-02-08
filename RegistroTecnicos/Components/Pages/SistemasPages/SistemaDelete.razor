@@ -1,0 +1,73 @@
+﻿@page "/Sistemas/Delete/{SistemaId:int}"
+@inject SistemasService sistemasService
+@inject NavigationManager navigation
+@rendermode InteractiveServer
+
+<PageTitle>Eliminar Sistema</PageTitle>
+<EditForm Model="sistemas" OnValidSubmit="Eliminar">
+    <DataAnnotationsValidator />
+
+    <div class="container bg-light">
+        <div class="card shadow">
+            <div class="card-header bg-primary">
+                <h3 class="card-title text-center text-white">Eliminar Sistema</h3>
+            </div>
+        </div>
+
+        <div class="card-body">
+            <h4 class="text-danger bg-light"> ¿Est&aacute;s seguro que quieres eliminar este sistema?</h4>
+
+            <div class="mb-1"></div>
+            <div class="container bg-light mt-4 me-auto">
+
+                <div class="card shadow">
+
+                    <h3 class="card-header card-title text-black"><strong>Datos del Sistema</strong></h3>
+                    <div class="card-body">
+                        <p class="mb-0"><strong>Sistema ID:</strong> @sistemas.SistemaId</p>
+
+                        <div class="mb-1">
+                            <p class="mb-0"><strong>Descripción:</strong> @sistemas.Descripcion</p>
+                        </div>
+
+                        <div class="mb-1">
+                            <p class="mb-0"><strong>Complejidad:</strong>@sistemas.Complejidad</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <button type="button" class="btn btn-outline-danger bi bi-trash" @onclick="Eliminar">Eliminar</button>
+                    <button type="button" class="btn btn-outline-primary bi bi-box-arrow-left" @onclick="Volver">Volver</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</EditForm>
+
+@code {
+    [Parameter]
+    public int SistemaId { get; set; }
+    public Sistemas sistemas = new Sistemas();
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        sistemas = await sistemasService.Buscar(SistemaId);
+
+    }
+
+    public async Task Eliminar()
+    {
+        var eliminar = await sistemasService.Eliminar(sistemas.SistemaId);
+
+        if (eliminar)
+        {
+            Volver();
+        }
+    }
+
+    public void Volver()
+    {
+        navigation.NavigateTo("Sistemas/Index");
+    }
+}

@@ -1,0 +1,91 @@
+﻿@page "/Sistemas/Create"
+@inject SistemasService sistemasService
+@inject NavigationManager navigation
+@rendermode InteractiveServer
+@inject Blazored.Toast.Services.IToastService ToastService
+
+<PageTitle>Crear Sistema</PageTitle>
+
+<div>
+    @if (!string.IsNullOrEmpty(MensajeError))
+    {
+        <div class="alert alert-danger">@MensajeError</div>
+    }
+</div>
+
+<EditForm Model="sistemas" OnValidSubmit="Guardar">
+    <DataAnnotationsValidator />
+
+    <div class="container bg-light">
+        <div class="card shadow">
+            <div class="card-header text-center bg-primary">
+                <h5 class="card-title text-white">Registro de Sistemas</h5>
+            </div>
+
+            <div class="card-body">
+                @*SistemaId*@
+                <div class="mb-3">
+                    <label class="form-label"><strong>Sistema ID</strong></label>
+                    <InputNumber id="id" class="form-control" @bind-Value="sistemas.SistemaId" readonly></InputNumber>
+                </div>
+
+                @*Descripcion*@
+                <div class="mb-3">
+                    <label class="form-label"><strong>Descripción</strong></label>
+                    <InputText id="Nombre" class="form-control" @bind-Value="sistemas.Descripcion" />
+                    <ValidationMessage For="@(() => sistemas.Descripcion)" />
+                </div>
+
+                @*Complejidad*@
+                <div class="mb-3">
+                    <label class="form-label"><strong>Complejidad</strong></label>
+                    <InputNumber id="Complejidad" class="form-control" @bind-Value="sistemas.Complejidad"/>
+                    <ValidationMessage For="@(() => sistemas.Complejidad)" />
+                </div>
+            </div>
+
+            @*footer*@
+            <div class="card-footer text-center mt-2">
+                <button type="button" class="btn btn-outline-primary" @onclick="Nuevo"> <i class="bi bi-plus"></i> Nuevo </button>
+                <button type="submit" class="btn btn-outline-success"> <i class="bi bi-check-circle-fill"></i> Guardar </button>
+                <a href="/Sistemas/Index" class="btn btn-outline-danger" @onclick="Volver"> <i class="bi bi-arrow-bar-left"></i> Retroceder</a>
+            </div>
+        </div>
+    </div>
+</EditForm>
+
+@code {
+
+    public string MensajeError { get; set; } = string.Empty;
+    public Sistemas sistemas { get; set; } = new Sistemas();
+    public List<Sistemas> sistema = new List<Sistemas>();
+
+    protected override async Task OnInitializedAsync(){
+
+        sistema = await sistemasService.Listar(s => true);
+    }
+
+    public async Task Guardar()
+    {
+        if (sistemas.Complejidad <= 0 )
+        {
+            MensajeError = "Debe escribir un nivel de complejidad";
+            return;
+        }
+        
+            await sistemasService.Guardar(sistemas);
+            sistemas = new Sistemas();
+            Volver();
+    }
+
+    public void Volver()
+    {
+        navigation.NavigateTo("Sistemas/Index");
+    }
+
+    public void Nuevo()
+    {
+        this.sistemas = new Sistemas();
+    }
+    
+}
